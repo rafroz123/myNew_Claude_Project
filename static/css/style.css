@@ -1,0 +1,156 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #0f1b2d;
+    color: #e0e8f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Home */
+.home-container {
+    text-align: center;
+}
+
+.home-container h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #7eb8f7;
+}
+
+.home-container p {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    color: #a0b4c8;
+}
+
+/* Meditation */
+.meditation-container {
+    text-align: center;
+    position: relative;
+    padding: 2rem;
+}
+
+.meditation-container h1 {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    color: #7eb8f7;
+}
+
+.subtitle {
+    color: #a0b4c8;
+    margin-bottom: 2.5rem;
+    font-size: 0.95rem;
+}
+
+.circle-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    width: 220px;
+    height: 220px;
+}
+
+.breath-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #4a90d9, #1a3a5c);
+    box-shadow: 0 0 30px #4a90d988;
+    transition: transform 0.3s ease;
+}
+
+.breath-label {
+    position: absolute;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #ffffff;
+    pointer-events: none;
+}
+
+.phase-info {
+    color: #a0b4c8;
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 2rem;
+    background: #4a90d9;
+    color: #fff;
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    margin: 0.4rem;
+    transition: background 0.2s;
+}
+
+.btn:hover {
+    background: #3578c0;
+}
+
+.btn-stop {
+    background: #c0392b;
+}
+
+.btn-stop:hover {
+    background: #a93226;
+}
+
+.back-link {
+    position: absolute;
+    top: 0;
+    left: 0;
+    color: #7eb8f7;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.back-link:hover {
+    text-decoration: underline;
+}
+
+/* Countdown timer */
+.countdown {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #7eb8f7;
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.05em;
+}
+
+/* Session banner */
+.session-banner {
+    background: #1a3a5c;
+    color: #7eb8f7;
+    border: 1px solid #4a90d9;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    margin-bottom: 1.5rem;
+    font-size: 1rem;
+    font-weight: 600;
+    opacity: 1;
+}
+
+.session-banner.fade-out {
+    animation: fadeOut 3s forwards;
+}
+
+@keyframes fadeOut {
+    0%   { opacity: 1; }
+    70%  { opacity: 1; }
+    100% { opacity: 0; }
+}

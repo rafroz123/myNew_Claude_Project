@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meditation & Breathing</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="manifest" href="/static/manifest.json">
+    <meta name="theme-color" content="#0f1b2d">
+</head>
+<body>
+    <div class="meditation-container">
+        <a href="/" class="back-link">← Back</a>
+        <h1>Breathing Exercise</h1>
+        <p class="subtitle">Box Breathing: reduces stress and calms the mind.</p>
+
+        <div id="session-banner" class="session-banner" style="display:none;"></div>
+
+        <div class="circle-wrapper">
+            <div class="breath-circle" id="circle"></div>
+            <span class="breath-label" id="label">Press Start</span>
+        </div>
+
+        <div class="phase-info" id="phase-info">Inhale 4s → Hold 4s → Exhale 4s → Hold 4s</div>
+        <div class="countdown" id="countdown"></div>
+
+        <button class="btn" id="startBtn" onclick="startBreathing()">Start</button>
+        <button class="btn btn-stop" id="stopBtn" onclick="stopBreathing()" style="display:none;">Stop</button>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/meditation.js') }}"></script>
+</body>
+</html>
