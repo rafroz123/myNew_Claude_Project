@@ -14,10 +14,23 @@ let bellTimeout = null;
 let secondsLeft = SESSION_DURATION;
 
 // --- Audio playback ---
+const clips = ["session_start.mp3", "inhale.mp3", "hold.mp3", "exhale.mp3", "session_end.mp3"];
+const audioElements = {};
+
+function unlockAudio() {
+    // Pre-load all clips during user tap to unlock iOS audio restrictions
+    clips.forEach(clip => {
+        const audio = new Audio(`/static/audio/${clip}`);
+        audio.load();
+        audioElements[clip] = audio;
+    });
+}
+
 function playClip(filename, onDone) {
-    const audio = new Audio(`/static/audio/${filename}`);
-    audio.play();
+    const audio = audioElements[filename] || new Audio(`/static/audio/${filename}`);
+    audio.currentTime = 0;
     if (onDone) audio.onended = onDone;
+    audio.play().catch(() => {});
 }
 
 // --- Ambient Music ---
@@ -133,6 +146,7 @@ function stopAmbientMusic() {
 
 // --- Session ---
 function startBreathing() {
+    unlockAudio();
     running = true;
     secondsLeft = SESSION_DURATION;
     document.getElementById("startBtn").style.display = "none";
