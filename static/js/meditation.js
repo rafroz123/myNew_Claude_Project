@@ -1,8 +1,8 @@
 const phases = [
-    { label: "Inhale",  duration: 4, scale: 1.6 },
-    { label: "Hold",    duration: 4, scale: 1.6 },
-    { label: "Exhale",  duration: 4, scale: 1.0 },
-    { label: "Hold",    duration: 4, scale: 1.0 },
+    { label: "Inhale",  audio: "inhale.mp3",  duration: 4, scale: 1.6 },
+    { label: "Hold",    audio: "hold.mp3",     duration: 4, scale: 1.6 },
+    { label: "Exhale",  audio: "exhale.mp3",   duration: 4, scale: 1.0 },
+    { label: "Hold",    audio: "hold.mp3",     duration: 4, scale: 1.0 },
 ];
 
 const SESSION_DURATION = 5 * 60;
@@ -12,6 +12,13 @@ let phaseTimeout = null;
 let countdownInterval = null;
 let bellTimeout = null;
 let secondsLeft = SESSION_DURATION;
+
+// --- Audio playback ---
+function playClip(filename, onDone) {
+    const audio = new Audio(`/static/audio/${filename}`);
+    audio.play();
+    if (onDone) audio.onended = onDone;
+}
 
 // --- Ambient Music ---
 let audioCtx = null;
@@ -27,14 +34,12 @@ function startAmbientMusic() {
     masterGain.gain.linearRampToValueAtTime(0.22, audioCtx.currentTime + 6);
     masterGain.connect(audioCtx.destination);
 
-    // Warm low-pass filter
     const filter = audioCtx.createBiquadFilter();
     filter.type = "lowpass";
     filter.frequency.setValueAtTime(500, audioCtx.currentTime);
     filter.Q.setValueAtTime(0.4, audioCtx.currentTime);
     filter.connect(masterGain);
 
-    // Very slow filter sweep for movement
     const filterLFO = audioCtx.createOscillator();
     const filterLFOGain = audioCtx.createGain();
     filterLFO.frequency.setValueAtTime(0.025, audioCtx.currentTime);
@@ -44,7 +49,6 @@ function startAmbientMusic() {
     filterLFO.start();
     allOscillators.push(filterLFO);
 
-    // Reverb using two feedback delays
     const delay1 = audioCtx.createDelay(3);
     delay1.delayTime.setValueAtTime(0.9, audioCtx.currentTime);
     const delayFb1 = audioCtx.createGain();
@@ -61,20 +65,17 @@ function startAmbientMusic() {
     delayFb2.connect(delay2);
     delayFb2.connect(filter);
 
-    // Deep calming drone layers (432 Hz tuning, pentatonic)
     const droneFreqs = [108, 144, 216, 288, 324];
     const droneVols  = [0.55, 0.25, 0.18, 0.12, 0.08];
 
     droneFreqs.forEach((freq, i) => {
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
-
         osc.type = "sine";
         osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
         osc.detune.setValueAtTime(i * 2 - 4, audioCtx.currentTime);
         gain.gain.setValueAtTime(droneVols[i], audioCtx.currentTime);
 
-        // Slow per-layer breathing LFO
         const lfo = audioCtx.createOscillator();
         const lfoGain = audioCtx.createGain();
         lfo.frequency.setValueAtTime(0.04 + i * 0.008, audioCtx.currentTime);
@@ -112,7 +113,6 @@ function scheduleBell() {
     osc.start();
     osc.stop(audioCtx.currentTime + 5.1);
 
-    // Next soft bell in 10–18 seconds
     bellTimeout = setTimeout(scheduleBell, (10 + Math.random() * 8) * 1000);
 }
 
@@ -131,36 +131,6 @@ function stopAmbientMusic() {
     }, 2200);
 }
 
-// --- British female voice ---
-function getBritishVoice() {
-    const voices = speechSynthesis.getVoices();
-    const priority = [
-        "Google UK English Female",
-        "Microsoft Hazel",
-        "Microsoft Susan",
-        "Microsoft Zira",
-    ];
-    for (const name of priority) {
-        const v = voices.find(v => v.name.includes(name));
-        if (v) return v;
-    }
-    return voices.find(v => v.lang === "en-GB") ||
-           voices.find(v => v.lang.startsWith("en")) ||
-           voices[0];
-}
-
-function speak(text, onDone) {
-    speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate   = 0.52;
-    utterance.pitch  = 0.78;
-    utterance.volume = 0.95;
-    const voice = getBritishVoice();
-    if (voice) utterance.voice = voice;
-    if (onDone) utterance.onend = onDone;
-    speechSynthesis.speak(utterance);
-}
-
 // --- Session ---
 function startBreathing() {
     running = true;
@@ -170,7 +140,7 @@ function startBreathing() {
     document.getElementById("phase-info").textContent = "";
     startAmbientMusic();
     showBanner("Ronova your new session starts now");
-    speak("Ronova, your new session starts now.", () => runPhase(0));
+    playClip("session_start.mp3", () => runPhase(0));
     startCountdown();
 }
 
@@ -179,7 +149,6 @@ function stopBreathing() {
     clearTimeout(phaseTimeout);
     clearTimeout(bellTimeout);
     clearInterval(countdownInterval);
-    speechSynthesis.cancel();
     stopAmbientMusic();
     const circle = document.getElementById("circle");
     circle.style.transform = "scale(1)";
@@ -199,7 +168,7 @@ function runPhase(index) {
     document.getElementById("label").textContent = phase.label;
     circle.style.transition = `transform ${phase.duration}s ease`;
     circle.style.transform = `scale(${phase.scale})`;
-    setTimeout(() => speak(phase.label), 300);
+    setTimeout(() => playClip(phase.audio), 300);
     phaseTimeout = setTimeout(() => runPhase(index + 1), phase.duration * 1000);
 }
 
@@ -210,7 +179,7 @@ function startCountdown() {
         updateCountdownDisplay();
         if (secondsLeft <= 0) {
             clearInterval(countdownInterval);
-            restartSession();
+            endSession();
         }
     }, 1000);
 }
@@ -221,12 +190,19 @@ function updateCountdownDisplay() {
     document.getElementById("countdown").textContent = `${m}:${s}`;
 }
 
-function restartSession() {
+function endSession() {
     clearTimeout(phaseTimeout);
-    secondsLeft = SESSION_DURATION;
-    showBanner("Ronova your new session starts now");
-    speak("Ronova, your new session starts now.", () => runPhase(0));
-    startCountdown();
+    document.getElementById("label").textContent = "";
+    const circle = document.getElementById("circle");
+    circle.style.transform = "scale(1)";
+    showBanner("Thank you for turning my intentions into reality and guiding me toward my highest potential");
+    playClip("session_end.mp3", () => {
+        if (!running) return;
+        secondsLeft = SESSION_DURATION;
+        showBanner("Ronova your new session starts now");
+        playClip("session_start.mp3", () => runPhase(0));
+        startCountdown();
+    });
 }
 
 function showBanner(message) {
@@ -237,6 +213,3 @@ function showBanner(message) {
     void banner.offsetWidth;
     banner.classList.add("fade-out");
 }
-
-// Pre-load voices
-speechSynthesis.onvoiceschanged = () => speechSynthesis.getVoices();
