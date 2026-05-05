@@ -132,6 +132,15 @@ body {
     letter-spacing: 0.05em;
 }
 
+/* Session timestamp */
+.session-timestamp {
+    color: #a0b4c8;
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+    letter-spacing: 0.03em;
+    min-height: 1.1em;
+}
+
 /* Session banner */
 .session-banner {
     background: #1a3a5c;

@@ -144,11 +144,21 @@ function stopAmbientMusic() {
     }, 2200);
 }
 
+// --- Timestamp ---
+function formatTime(date) {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+}
+
+function setTimestamp(text) {
+    document.getElementById("session-timestamp").textContent = text;
+}
+
 // --- Session ---
 function startBreathing() {
     unlockAudio();
     running = true;
     secondsLeft = SESSION_DURATION;
+    setTimestamp(`Started at ${formatTime(new Date())}`);
     document.getElementById("startBtn").style.display = "none";
     document.getElementById("stopBtn").style.display = "inline-block";
     document.getElementById("phase-info").textContent = "";
@@ -173,6 +183,7 @@ function stopBreathing() {
     document.getElementById("session-banner").style.display = "none";
     document.getElementById("startBtn").style.display = "inline-block";
     document.getElementById("stopBtn").style.display = "none";
+    setTimestamp(`Stopped at ${formatTime(new Date())}`);
 }
 
 function runPhase(index) {
