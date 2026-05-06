@@ -1,4 +1,4 @@
-const CACHE = "ronova-v1";
+const CACHE = "ronova-v2";
 const ASSETS = ["/", "/meditation", "/static/css/style.css", "/static/js/meditation.js", "/static/js/main.js"];
 
 self.addEventListener("install", e => {
