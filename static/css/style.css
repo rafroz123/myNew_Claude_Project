@@ -132,13 +132,35 @@ body {
     letter-spacing: 0.05em;
 }
 
-/* Session timestamp */
+/* Session timestamp row */
+.timestamp-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+    min-height: 1.8em;
+}
+
 .session-timestamp {
     color: #a0b4c8;
     font-size: 0.8rem;
-    margin-bottom: 1rem;
     letter-spacing: 0.03em;
-    min-height: 1.1em;
+}
+
+.btn-seek {
+    background: none;
+    border: 1px solid #4a90d9;
+    color: #7eb8f7;
+    border-radius: 20px;
+    padding: 0.15rem 0.65rem;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-seek:hover {
+    background: #1a3a5c;
 }
 
 /* Session banner */

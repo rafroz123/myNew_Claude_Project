@@ -153,12 +153,25 @@ function setTimestamp(text) {
     document.getElementById("session-timestamp").textContent = text;
 }
 
+function seekSession(delta) {
+    if (!running) return;
+    secondsLeft = Math.min(SESSION_DURATION, Math.max(1, secondsLeft + delta));
+    updateCountdownDisplay();
+}
+
+function setSeekVisible(visible) {
+    const display = visible ? "inline-block" : "none";
+    document.getElementById("seekBack").style.display = display;
+    document.getElementById("seekFwd").style.display = display;
+}
+
 // --- Session ---
 function startBreathing() {
     unlockAudio();
     running = true;
     secondsLeft = SESSION_DURATION;
     setTimestamp(`Started at ${formatTime(new Date())}`);
+    setSeekVisible(true);
     document.getElementById("startBtn").style.display = "none";
     document.getElementById("stopBtn").style.display = "inline-block";
     document.getElementById("phase-info").textContent = "";
@@ -183,6 +196,7 @@ function stopBreathing() {
     document.getElementById("session-banner").style.display = "none";
     document.getElementById("startBtn").style.display = "inline-block";
     document.getElementById("stopBtn").style.display = "none";
+    setSeekVisible(false);
     setTimestamp(`Stopped at ${formatTime(new Date())}`);
 }
 
