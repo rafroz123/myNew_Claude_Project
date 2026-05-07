@@ -1,0 +1,41 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint Python
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - run: pip install flake8
+      - run: flake8 app.py wsgi.py --max-line-length=120
+
+  deploy:
+    name: Deploy to PythonAnywhere
+    needs: lint
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Pull latest code
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ssh.pythonanywhere.com
+          username: rafroz123
+          key: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}
+          script: |
+            cd ~/myNew_Claude_Project
+            git pull origin main
+
+      - name: Reload web app
+        run: |
+          curl -s -X POST \
+            -H "Authorization: Token ${{ secrets.PYTHONANYWHERE_API_TOKEN }}" \
+            https://www.pythonanywhere.com/api/v0/user/rafroz123/webapps/rafroz123.pythonanywhere.com/reload/
