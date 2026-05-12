@@ -10,19 +10,27 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip3 install -r requirements.txt'
+                sh '''
+                    python3 -m venv venv
+                    . venv/bin/activate
+                    pip install -r requirements.txt
+                '''
             }
         }
 
         stage('Test') {
             steps {
-                sh 'python3 -m pytest tests/ -v || echo "No tests found, skipping."'
+                sh '''
+                    . venv/bin/activate
+                    python3 -m pytest tests/ -v || echo "No tests found, skipping."
+                '''
             }
         }
 
         stage('Run App Check') {
             steps {
                 sh '''
+                    . venv/bin/activate
                     python3 -c "
 from app import app
 client = app.test_client()
