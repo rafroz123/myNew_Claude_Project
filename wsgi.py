@@ -1,5 +1,4 @@
 import sys
-import os
 
 project_home = '/home/rafroz123/myNew_Claude_Project'
 if project_home not in sys.path:
