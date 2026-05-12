@@ -1,7 +1,5 @@
 pipeline {
-    agent {
-        docker { image 'python:3.11-slim' }
-    }
+    agent any
 
     stages {
         stage('Checkout') {
@@ -12,20 +10,20 @@ pipeline {
 
         stage('Install Dependencies') {
             steps {
-                sh 'pip install -r requirements.txt'
+                sh 'pip3 install -r requirements.txt'
             }
         }
 
         stage('Test') {
             steps {
-                sh 'python -m pytest tests/ -v || echo "No tests found, skipping."'
+                sh 'python3 -m pytest tests/ -v || echo "No tests found, skipping."'
             }
         }
 
         stage('Run App Check') {
             steps {
                 sh '''
-                    python -c "
+                    python3 -c "
 from app import app
 client = app.test_client()
 r1 = client.get('/')
