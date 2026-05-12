@@ -45,6 +45,25 @@ print('All routes OK')
         }
     }
 
+        stage('Deploy to PythonAnywhere') {
+            when { branch 'main' }
+            steps {
+                withCredentials([
+                    sshUserPrivateKey(credentialsId: 'pythonanywhere-ssh-key', keyFileVariable: 'SSH_KEY'),
+                    string(credentialsId: 'pythonanywhere-api-token', variable: 'API_TOKEN')
+                ]) {
+                    sh '''
+                        ssh -i $SSH_KEY -o StrictHostKeyChecking=no rafroz123@ssh.pythonanywhere.com \
+                            "cd ~/myNew_Claude_Project && git pull origin main"
+                        curl -s -X POST \
+                            -H "Authorization: Token $API_TOKEN" \
+                            https://www.pythonanywhere.com/api/v0/user/rafroz123/webapps/rafroz123.pythonanywhere.com/reload/
+                    '''
+                }
+            }
+        }
+    }
+
     post {
         success {
             echo 'Pipeline passed — Ronova Meditation app is healthy!'
