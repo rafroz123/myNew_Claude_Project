@@ -43,7 +43,6 @@ print('All routes OK')
                 '''
             }
         }
-    }
 
         stage('Deploy to PythonAnywhere') {
             when { branch 'main' }
