@@ -24,18 +24,27 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Pull latest code
-        uses: appleboy/ssh-action@v1
-        with:
-          host: ssh.pythonanywhere.com
-          username: rafroz123
-          key: ${{ secrets.PYTHONANYWHERE_SSH_KEY }}
-          script: |
-            cd ~/myNew_Claude_Project
-            git pull origin main
+      - name: Git pull via PythonAnywhere console API
+        run: |
+          CONSOLE_ID=$(curl -s -X POST \
+            -H "Authorization: Token ${{ secrets.PYTHONANYWHERE_API_TOKEN }}" \
+            -d "executable=bash" \
+            https://www.pythonanywhere.com/api/v0/user/rafroz123/consoles/ \
+            | python3 -c "import sys,json; print(json.load(sys.stdin)['id'])")
+
+          curl -s -X POST \
+            -H "Authorization: Token ${{ secrets.PYTHONANYWHERE_API_TOKEN }}" \
+            -d "input=cd ~/myNew_Claude_Project && git pull origin main && echo __DONE__\n" \
+            "https://www.pythonanywhere.com/api/v0/user/rafroz123/consoles/${CONSOLE_ID}/send_input/"
+
+          sleep 20
+
+          curl -s -X DELETE \
+            -H "Authorization: Token ${{ secrets.PYTHONANYWHERE_API_TOKEN }}" \
+            "https://www.pythonanywhere.com/api/v0/user/rafroz123/consoles/${CONSOLE_ID}/"
 
       - name: Reload web app
         run: |
-          curl -s -X POST \
+          curl -s -f -X POST \
             -H "Authorization: Token ${{ secrets.PYTHONANYWHERE_API_TOKEN }}" \
             https://www.pythonanywhere.com/api/v0/user/rafroz123/webapps/rafroz123.pythonanywhere.com/reload/
